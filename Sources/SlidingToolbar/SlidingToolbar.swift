@@ -119,7 +119,7 @@ public class SlidingToolbar: UIViewController, UIScrollViewDelegate {
         
         self.contentViewController = ToolbarViewController()
         self.contentViewController.toolbarView.side = side
-        self.contentViewController.openToolbarAction = expand
+        self.contentViewController.tapToolbarAction = expand
 
         self.setupContent(content: self.contentViewController, attachedTo: side, withOffsets: offsets)
     }

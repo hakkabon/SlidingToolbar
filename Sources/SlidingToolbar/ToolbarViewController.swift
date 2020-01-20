@@ -9,11 +9,11 @@
 import UIKit
 
 @available(iOS 9.0, *)
-open class ToolbarViewController: UIViewController {
+final public class ToolbarViewController: UIViewController {
 
-    var openToolbarAction: (() -> ())?
+    var tapToolbarAction: (() -> ())?
     
-    lazy var toolbarView: ToolbarView = {        // Content View
+    lazy var toolbarView: ToolbarView = {
         let view = ToolbarView()
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -22,20 +22,20 @@ open class ToolbarViewController: UIViewController {
     public var showShadow: Bool = false {
         didSet {
             if showShadow {
-                self.view.layer.shadowColor = UIColor.black.cgColor
-                self.view.layer.shadowOpacity = 0.5
-                self.view.layer.shadowRadius = 5.0
-                self.view.layer.shadowOffset = CGSize.init(width: 0, height: 0)
+                self.toolbarView.layer.shadowColor = UIColor.black.cgColor
+                self.toolbarView.layer.shadowOpacity = 0.5
+                self.toolbarView.layer.shadowRadius = 5.0
+                self.toolbarView.layer.shadowOffset = CGSize.init(width: 0, height: 0)
             } else {
-                self.view.layer.shadowRadius = 0.0
+                self.toolbarView.layer.shadowRadius = 0.0
             }
         }
     }
 
     public var cornerRadius: Float = 0.0 {
         didSet {
-            self.view.layer.cornerRadius = CGFloat(cornerRadius)
-            self.view.subviews.first?.layer.cornerRadius = CGFloat(cornerRadius)
+            self.toolbarView.layer.cornerRadius = CGFloat(cornerRadius)
+            self.toolbarView.subviews.first?.layer.cornerRadius = CGFloat(cornerRadius)
         }
     }
 
@@ -47,7 +47,7 @@ open class ToolbarViewController: UIViewController {
         super.init(coder: aDecoder)
     }
 
-    override open func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
 
         self.view.addSubview(toolbarView)
@@ -69,6 +69,6 @@ open class ToolbarViewController: UIViewController {
     }
     
     func handleTapAction() {
-        openToolbarAction?()
+        tapToolbarAction?()
     }
 }

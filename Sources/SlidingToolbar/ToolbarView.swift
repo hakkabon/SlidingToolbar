@@ -9,7 +9,7 @@
 import UIKit
 
 @available(iOS 9.0, *)
-class ToolbarView: UIView {
+public class ToolbarView: UIView {
     
     public var side: SlidingToolbarPosition = .left {
         didSet {
@@ -56,12 +56,25 @@ class ToolbarView: UIView {
                 $0.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
                 $0.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
             }
+            if let b0 = toolbarButtons.first {
+                toolbarButtons.dropFirst().forEach { button in
+                    if button.buttonType == .button {
+                        button.heightAnchor.constraint(equalTo: b0.heightAnchor).isActive = true
+                    } else {
+                        button.heightAnchor.constraint(equalTo: b0.heightAnchor, multiplier: 0.25).isActive = true
+                    }
+                }
+            }
             self.barSize = CGSize(width: self.barSize.width, height: minHeight)
         }
     }
     
     var minHeight: CGFloat {
-        return CGFloat(toolbarButtons.count) * ( barSize.width + margin ) + 2 * margin
+        let buttons = toolbarButtons.reduce(0) { $1.buttonType == .button ? $0 + 1 : $0 }
+        let separators = toolbarButtons.count - buttons
+        var height = CGFloat(separators) * (barSize.width * 0.25 + margin)
+        height += CGFloat(buttons) * ( barSize.width + margin) //+ 2 * margin
+        return height
     }
     
     lazy var barView: UIView = {
@@ -81,7 +94,7 @@ class ToolbarView: UIView {
         let stack = UIStackView()
         stack.axis = .vertical
         stack.alignment = .fill
-        stack.distribution = .fillEqually
+        stack.distribution = .fill
         stack.spacing = 0
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
@@ -89,7 +102,7 @@ class ToolbarView: UIView {
     
     let blurEffect = UIBlurEffect(style: .dark)
     
-    lazy var blurView: UIVisualEffectView = {
+    lazy var blurredView: UIVisualEffectView = {
         let effect = UIVisualEffectView(effect: blurEffect)
         effect.translatesAutoresizingMaskIntoConstraints = false
         return effect
@@ -114,7 +127,7 @@ class ToolbarView: UIView {
         initialize()
     }
     
-    override func awakeFromNib() {
+    override public func awakeFromNib() {
         super.awakeFromNib()
         initialize()
     }
@@ -128,12 +141,12 @@ class ToolbarView: UIView {
         barView.addSubview(stackView)
         barView.addSubview(tabView)
         
-        barView.insertSubview(blurView, at: 0)
-        blurView.contentView.addSubview(vibrancyView)
+        barView.insertSubview(blurredView, at: 0)
+        blurredView.contentView.addSubview(vibrancyView)
         vibrancyView.contentView.addSubview(stackView)
     }
     
-    override func updateConstraints() {
+    override public func updateConstraints() {
         switch side {
         case .left:
             barHeightConstraint = barView.heightAnchor.constraint(equalToConstant: barSize.height)
@@ -152,7 +165,7 @@ class ToolbarView: UIView {
             ])
             NSLayoutConstraint.activate([
                 tabView.centerYAnchor.constraint(equalTo: self.centerYAnchor),
-                tabView.heightAnchor.constraint(equalTo: barView.heightAnchor, multiplier: 0.25),
+                tabView.heightAnchor.constraint(equalTo: barView.heightAnchor, multiplier: 0.5),
                 tabView.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 0.5),
                 tabView.leadingAnchor.constraint(equalTo: barView.trailingAnchor),
             ])
@@ -173,22 +186,22 @@ class ToolbarView: UIView {
             ])
             NSLayoutConstraint.activate([
                 tabView.centerYAnchor.constraint(equalTo: self.centerYAnchor),
-                tabView.heightAnchor.constraint(equalTo: barView.heightAnchor, multiplier: 0.25),
+                tabView.heightAnchor.constraint(equalTo: barView.heightAnchor, multiplier: 0.5),
                 tabView.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 0.5),
                 tabView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             ])
         }
         NSLayoutConstraint.activate([
-            blurView.heightAnchor.constraint(equalTo: barView.heightAnchor),
-            blurView.widthAnchor.constraint(equalTo: barView.widthAnchor),
-            blurView.centerXAnchor.constraint(equalTo: barView.centerXAnchor),
-            blurView.centerYAnchor.constraint(equalTo: barView.centerYAnchor)
+            blurredView.heightAnchor.constraint(equalTo: barView.heightAnchor),
+            blurredView.widthAnchor.constraint(equalTo: barView.widthAnchor),
+            blurredView.centerXAnchor.constraint(equalTo: barView.centerXAnchor),
+            blurredView.centerYAnchor.constraint(equalTo: barView.centerYAnchor)
         ])
         NSLayoutConstraint.activate([
-            vibrancyView.heightAnchor.constraint(equalTo: blurView.contentView.heightAnchor),
-            vibrancyView.widthAnchor.constraint(equalTo: blurView.contentView.widthAnchor),
-            vibrancyView.centerXAnchor.constraint(equalTo: blurView.contentView.centerXAnchor),
-            vibrancyView.centerYAnchor.constraint(equalTo: blurView.contentView.centerYAnchor)
+            vibrancyView.heightAnchor.constraint(equalTo: blurredView.contentView.heightAnchor),
+            vibrancyView.widthAnchor.constraint(equalTo: blurredView.contentView.widthAnchor),
+            vibrancyView.centerXAnchor.constraint(equalTo: blurredView.contentView.centerXAnchor),
+            vibrancyView.centerYAnchor.constraint(equalTo: blurredView.contentView.centerYAnchor)
         ])
         
         super.updateConstraints()
@@ -212,10 +225,10 @@ class ToolbarView: UIView {
         maskLayer.frame = barView.bounds
         maskLayer.path = maskPath.cgPath
         barView.layer.mask = maskLayer
-        blurView.layer.mask = maskLayer
+        blurredView.layer.mask = maskLayer
     }
     
-    override func layoutSubviews() {
+    override public func layoutSubviews() {
         super.layoutSubviews()
         layoutToolbar()
     }
