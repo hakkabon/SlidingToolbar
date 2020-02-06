@@ -114,8 +114,15 @@ public class ToolbarView: UIView {
         return vibrancy
     }()
     
-    var barHeightConstraint: NSLayoutConstraint!
-    var barWidthConstraint: NSLayoutConstraint!
+    lazy var barHeightConstraint: NSLayoutConstraint = {
+        let constraint = barView.heightAnchor.constraint(equalToConstant: 100)
+        return constraint
+    }()
+    
+    lazy var barWidthConstraint: NSLayoutConstraint = {
+        let constraint = barView.widthAnchor.constraint(equalToConstant: 54)
+        return constraint
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -149,8 +156,6 @@ public class ToolbarView: UIView {
     override public func updateConstraints() {
         switch side {
         case .left:
-            barHeightConstraint = barView.heightAnchor.constraint(equalToConstant: barSize.height)
-            barWidthConstraint = barView.widthAnchor.constraint(equalToConstant: barSize.width)
             NSLayoutConstraint.activate([
                 barView.centerYAnchor.constraint(equalTo: self.centerYAnchor),
                 barView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
@@ -170,8 +175,6 @@ public class ToolbarView: UIView {
                 tabView.leadingAnchor.constraint(equalTo: barView.trailingAnchor),
             ])
         case .right:
-            barHeightConstraint = barView.heightAnchor.constraint(equalToConstant: barSize.height)
-            barWidthConstraint = barView.widthAnchor.constraint(equalToConstant: barSize.width)
             NSLayoutConstraint.activate([
                 barView.centerYAnchor.constraint(equalTo: self.centerYAnchor),
                 barView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: barSize.width),
@@ -233,37 +236,32 @@ public class ToolbarView: UIView {
         layoutToolbar()
     }
     
-//    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-//        //if super.point(inside: point, with: event) { return true }
-//        for subview in subviews {
-//            let subviewPoint = subview.convert(point, from: self)
-//            if subview.point(inside: subviewPoint, with: event) { return true }
-//        }
-//        return false
-//    }
+    override public func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        return overlapHitTest(point: point, with: event)
+    }
+}
+
+// https://stackoverflow.com/questions/4961386/event-handling-for-ios-how-hittestwithevent-and-pointinsidewithevent-are-r
+extension UIView {
     
-//    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-//        if !self.clipsToBounds && !self.isHidden && self.alpha > 0.0 {
-//            let subviews = self.subviews.reversed()
-//            for member in subviews {
-//                let subPoint = member.convert(point, from: self)
-//                if let result: UIView = member.hitTest(subPoint, with:event) {
-//                    return result
-//                }
-//            }
-//        }
-//        return nil  //super.hitTest(point, with: event)
-//    }    
-    
-//    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-//        guard !clipsToBounds && !isHidden && alpha > 0 else { return nil }
-//
-//        for subview in subviews.reversed() {
-//            let subPoint = subview.convert(point, from: self)
-//            if let result = subview.hitTest(subPoint, with: event) {
-//                return result
-//            }
-//        }
-//        return nil
-//    }
+    func overlapHitTest(point: CGPoint, with event: UIEvent?) -> UIView? {
+        guard !isHidden && alpha > 0 else { return nil }
+        
+        var hitView: UIView? = self
+        if !self.point(inside: point, with: event) {
+             if self.clipsToBounds {
+                 return nil
+             } else {
+                 hitView = nil
+             }
+        }
+
+        for subview in subviews.reversed() {
+            let subPoint = subview.convert(point, from: self)
+            if let result = subview.overlapHitTest(point: subPoint, with: event) {
+                return result
+            }
+        }
+        return hitView
+    }
 }

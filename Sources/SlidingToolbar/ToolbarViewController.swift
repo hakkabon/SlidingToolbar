@@ -11,8 +11,6 @@ import UIKit
 @available(iOS 9.0, *)
 final public class ToolbarViewController: UIViewController {
 
-    var tapToolbarAction: (() -> ())?
-    
     lazy var toolbarView: ToolbarView = {
         let view = ToolbarView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -29,13 +27,6 @@ final public class ToolbarViewController: UIViewController {
             } else {
                 self.toolbarView.layer.shadowRadius = 0.0
             }
-        }
-    }
-
-    public var cornerRadius: Float = 0.0 {
-        didSet {
-            self.toolbarView.layer.cornerRadius = CGFloat(cornerRadius)
-            self.toolbarView.subviews.first?.layer.cornerRadius = CGFloat(cornerRadius)
         }
     }
 
@@ -61,14 +52,7 @@ final public class ToolbarViewController: UIViewController {
             toolbarView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
         ])
         
-        self.view.backgroundColor = .clear
-        self.view.frame = CGRect(origin: .zero, size: CGSize(width: 2 * toolbarView.barSize.width, height: self.view.bounds.height))
-        self.showShadow = true
-        
-        toolbarView.tabView.handleTapAction = handleTapAction
-    }
-    
-    func handleTapAction() {
-        tapToolbarAction?()
+        self.view.frame = CGRect(origin: .zero, size: CGSize(width: toolbarView.barSize.width, height: self.view.bounds.height))
+        showShadow = true
     }
 }

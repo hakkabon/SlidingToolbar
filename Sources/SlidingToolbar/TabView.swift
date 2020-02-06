@@ -60,8 +60,9 @@ class TabView: UIView {
 
     func initialize() {
         self.clipsToBounds = false
+        self.isUserInteractionEnabled = true
         self.backgroundColor = .clear
-        
+
         self.addSubview(gripView)
         self.insertSubview(blurredView, at: 0)
         blurredView.contentView.addSubview(vibrancyView)
@@ -104,7 +105,7 @@ class TabView: UIView {
         super.updateConstraints()
     }
     
-    @objc func handleTap(_ sender: AnyObject) {
+    @objc func handleTap(_ sender: UITapGestureRecognizer) {
         self.handleTapAction?()
     }
 }
@@ -136,7 +137,7 @@ class GripView: UIView {
     }
 
     func initialize() {
-        self.clipsToBounds = true
+        self.clipsToBounds = false
         self.backgroundColor = .clear
     }
     
