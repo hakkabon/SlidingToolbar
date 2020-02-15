@@ -26,7 +26,7 @@ public class SliderScrollView: UIScrollView {
                 NSLayoutConstraint.activate([
                     self.topAnchor.constraint(equalTo: parent.view.topAnchor),
                     self.bottomAnchor.constraint(equalTo: parent.view.bottomAnchor),
-                    self.trailingAnchor.constraint(equalTo: parent.view.trailingAnchor, constant: contentWidth),
+                    self.trailingAnchor.constraint(equalTo: parent.view.trailingAnchor),
                     self.heightAnchor.constraint(equalTo: parent.view.heightAnchor),
                     self.widthAnchor.constraint(equalToConstant: contentWidth),
                 ])
@@ -54,7 +54,18 @@ public class SliderScrollView: UIScrollView {
     /// Orientation for sliding container.
     public var position: SlidingToolbarPosition = .right
     
-    /// Expandable offset in % of content view. from 0 to 1.
+    /// Expandable offset in % of content view.
+    /// Note that the actual range of values are [0, 0.5].
+    ///
+    /// For the right side toolbar,
+    /// 0       => fully visible
+    /// 0.5     => completely hidden
+    ///
+    /// For the left side toolbar, 0 means completely hidden
+    /// 0       => completely hidden
+    /// 0.5     => fully visible
+    ///
+    /// Either left or right list of values has to be reversed.
     private var _offsets: [CGFloat] = []
     public var offsets: [CGFloat] {
         set {
@@ -64,7 +75,9 @@ public class SliderScrollView: UIScrollView {
             let valid = clearOffsets.reduce( true, { $0 && (0 <= $1 && $1 <= 1) })
             guard valid else { return }
             
-            _offsets = self.position == .left ? clearOffsets.map { 1 - $0 }.sorted { $0 > $1 } : clearOffsets.sorted { $0 < $1 }
+            let invertedScaled = clearOffsets.map { (1 - $0) * 0.5 }
+            let scaled = clearOffsets.map { $0 * 0.5 }
+            _offsets = self.position == .left ? invertedScaled.sorted { $0 < $1 } : scaled.sorted { $0 > $1 }
         }
         get {
             return _offsets
@@ -139,32 +152,24 @@ public class SliderScrollView: UIScrollView {
         },
             completion: {(_ finished: Bool) -> Void in
                 self.offsetIndex = offsetIndex
-                self.isOpen = {
-                    switch self.position {
-                    case .right:
-                        return offsetIndex == 0 ? false : true
-                    case .left:
-                        return offsetIndex == 0 ? false : true
-                    }
-                }()
-
+                self.isOpen = offsetIndex != self.offsets.count-1
                 self.panGestureRecognizer.isEnabled = true
                 completion?(finished)
         })
     }
     
     func expandWithCompletion(completion: ((Bool) -> Void)?) {
-        let nextIndex: Int = self.offsetIndex + 1 < self.offsets.count ? self.offsetIndex + 1 : self.offsetIndex
-        self.changeOffsetTo(offsetIndex: nextIndex, animated: false, completion: completion)
-    }
-    
-    func collapseWithCompletion(completion: ((Bool) -> Void)?) {
         let nextIndex: Int = self.offsetIndex == 0 ? 0 : self.offsetIndex - 1
         self.changeOffsetTo(offsetIndex: nextIndex, animated: false, completion: completion)
     }
     
+    func collapseWithCompletion(completion: ((Bool) -> Void)?) {
+        let nextIndex: Int = self.offsetIndex + 1 < self.offsets.count ? self.offsetIndex + 1 : self.offsetIndex
+        self.changeOffsetTo(offsetIndex: nextIndex, animated: false, completion: completion)
+    }
+    
     func closeWithCompletion(completion: ((Bool) -> Void)?) {
-        self.changeOffsetTo(offsetIndex: 0, animated: false, completion: completion)
+        self.changeOffsetTo(offsetIndex: offsets.count-1, animated: false, completion: completion)
     }
 
     // MARK: - Hit Test
