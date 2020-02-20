@@ -126,7 +126,7 @@ public class ToolbarView: UIView {
     
     class func blurEffectStyle() -> UIBlurEffect.Style {
         if #available(iOS 13, *) {
-            return .systemMaterial
+            return .systemUltraThinMaterial
         } else {
             return .dark
         }
