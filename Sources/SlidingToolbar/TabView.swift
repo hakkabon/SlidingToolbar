@@ -34,7 +34,7 @@ class TabView: UIView {
         return view
     }()
 
-    let blurEffect = UIBlurEffect(style: .dark)
+    let blurEffect = UIBlurEffect(style: blurEffectStyle())
 
     lazy var blurredView: UIVisualEffectView = {
         let effect = UIVisualEffectView(effect: blurEffect)
@@ -56,6 +56,14 @@ class TabView: UIView {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         initialize()
+    }
+
+    class func blurEffectStyle() -> UIBlurEffect.Style {
+        if #available(iOS 13, *) {
+            return .systemMaterial
+        } else {
+            return .dark
+        }
     }
 
     func initialize() {

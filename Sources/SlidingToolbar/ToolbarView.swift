@@ -100,7 +100,7 @@ public class ToolbarView: UIView {
         return stack
     }()
     
-    let blurEffect = UIBlurEffect(style: .dark)
+    let blurEffect = UIBlurEffect(style: blurEffectStyle())
     
     lazy var blurredView: UIVisualEffectView = {
         let effect = UIVisualEffectView(effect: blurEffect)
@@ -124,6 +124,14 @@ public class ToolbarView: UIView {
         return constraint
     }()
     
+    class func blurEffectStyle() -> UIBlurEffect.Style {
+        if #available(iOS 13, *) {
+            return .systemMaterial
+        } else {
+            return .dark
+        }
+    }
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         initialize()
