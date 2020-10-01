@@ -43,7 +43,7 @@ lbutton5.action = { /* do sothing meaningful here ... */ }
 
 ```
 ## Sample App
-There is demo project available at [SlidingToolbar-Demo ](https://github.com/hakkabon/SlidingToolbar-Demo)  with sample code explaing the use of the component.  
+There is demo project available at [SlidingToolbar-Demo ](https://github.com/hakkabon/SlidingToolbar-Demo)  with sample code explaining the use of the component.  
 
 ## License
 MIT
