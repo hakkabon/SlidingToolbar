@@ -25,6 +25,7 @@ let separator2 = ToolbarButton(separator: Separator())
 let lbutton5 = ToolbarButton(image: UIImage(named:"Icon-Trashcan")!)
 
 self.leftToolbar = SlidingToolbar(parent: self, attachedTo: .left, withOffsets: [0.1, 1])
+self.leftToolbar?.gripHeightMultiplier = 0.25
 self.leftToolbar?.buttons = [ lbutton1, lbutton2, separator1, lbutton3, lbutton4, separator2, lbutton5 ]
 self.leftToolbar?.delegate = self
 self.leftToolbar?.title = "Left Toolbar"
@@ -36,10 +37,10 @@ Attach a method to each toolbar button by assigning a closure to the action meth
 ```swift
 
 lbutton1.action = { print("button (1) tapped") }
-lbutton2.action = { /* do sothing meaningful here ... */ }
-lbutton3.action = { /* do sothing meaningful here ... */ }
-lbutton4.action = { /* do sothing meaningful here ... */ }
-lbutton5.action = { /* do sothing meaningful here ... */ }
+lbutton2.action = { /* do something meaningful here ... */ }
+lbutton3.action = { /* do something meaningful here ... */ }
+lbutton4.action = { /* do something meaningful here ... */ }
+lbutton5.action = { /* do something meaningful here ... */ }
 
 ```
 ## Sample App
