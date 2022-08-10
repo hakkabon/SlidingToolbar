@@ -24,6 +24,12 @@ public class ToolbarView: UIView {
         }
     }
     
+    public var gripHeightMultiplier: CGFloat = 0.5 {
+        didSet {
+            tabHeightConstraint.change(multiplier: gripHeightMultiplier)
+        }
+    }
+
     public var barSize: CGSize = CGSize(width: 54, height: 100) {
         didSet {
             // Make room for all buttons (avoid overlapping buttons).
@@ -123,7 +129,12 @@ public class ToolbarView: UIView {
         let constraint = barView.widthAnchor.constraint(equalToConstant: 54)
         return constraint
     }()
-    
+
+    lazy var tabHeightConstraint: NSLayoutConstraint = {
+        let constraint = tabView.heightAnchor.constraint(equalTo: barView.heightAnchor, multiplier: 0.5)
+        return constraint
+    }()
+
     class func blurEffectStyle() -> UIBlurEffect.Style {
         if #available(iOS 13, *) {
             return .systemUltraThinMaterial
@@ -178,7 +189,7 @@ public class ToolbarView: UIView {
             ])
             NSLayoutConstraint.activate([
                 tabView.centerYAnchor.constraint(equalTo: self.centerYAnchor),
-                tabView.heightAnchor.constraint(equalTo: barView.heightAnchor, multiplier: 0.5),
+                tabHeightConstraint,
                 tabView.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 0.5),
                 tabView.leadingAnchor.constraint(equalTo: barView.trailingAnchor),
             ])
@@ -197,7 +208,7 @@ public class ToolbarView: UIView {
             ])
             NSLayoutConstraint.activate([
                 tabView.centerYAnchor.constraint(equalTo: self.centerYAnchor),
-                tabView.heightAnchor.constraint(equalTo: barView.heightAnchor, multiplier: 0.5),
+                tabHeightConstraint,
                 tabView.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 0.5),
                 tabView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             ])
@@ -271,5 +282,22 @@ extension UIView {
             }
         }
         return hitView
+    }
+}
+
+extension NSLayoutConstraint {
+    func change(multiplier: CGFloat) {
+        let newConstraint = NSLayoutConstraint(item: firstItem as Any,
+                                               attribute: firstAttribute,
+                                               relatedBy: relation,
+                                               toItem: secondItem,
+                                               attribute: secondAttribute,
+                                               multiplier: multiplier,
+                                               constant: constant)
+
+        newConstraint.priority = self.priority
+
+        NSLayoutConstraint.deactivate([self])
+        NSLayoutConstraint.activate([newConstraint])
     }
 }
