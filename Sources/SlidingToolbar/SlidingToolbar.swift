@@ -86,6 +86,13 @@ public class SlidingToolbar: UIViewController {
         return controller
     }()
     
+    /// Height of the sliding toolbar grip (percent of total height).
+    public var gripHeightMultiplier: CGFloat = 0.5 {
+        didSet {
+            contentViewController.toolbarView.gripHeightMultiplier = gripHeightMultiplier
+        }
+    }
+
     /// Sorted list of offsets in % of contentVC view. from 0 to 1
     public var offsets: [CGFloat] {
         get {
